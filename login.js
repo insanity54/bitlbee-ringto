@@ -68,57 +68,59 @@ function makeOAuthOptions() {
 
 
 // make request to log in
-rp.post(makeLoginOptions())
-    .then(function(body) {
-	debug(typeof body);
-	debug(body);
-	assert.equal(body['ok'], true);
-	assert.isObject(body.user);
-	assert.isString(body.user.uuid);
-	assert.isNull(body.error);
-	assert.isNull(body.warning);
+module.exports = function login() {
+    return rp.post(makeLoginOptions())
+	.then(function(body) {
+	    debug(typeof body);
+	    debug(body);
+	    assert.equal(body['ok'], true);
+	    assert.isObject(body.user);
+	    assert.isString(body.user.uuid);
+	    assert.isNull(body.error);
+	    assert.isNull(body.warning);
+	    
+	    return body.user;
+	})
+    
+    
+	.then(function(user) {
+	    
+	    assert.isString(user.uuid);
+	    uuid = user.uuid;
 
-	return body.user;
-    })
 
+	    // make request to get OAuth bearer token
+	    return rp.get(makeOAuthOptions())
+		.then(function(body) {
+		    // get token from body
+		    debug(body);
+		    assert.equal(body['token_type'], 'bearer');
+		    assert.isString(body['access_token']);
+		    assert.isObject(body['extra_data']);
+		    assert.isObject(body['extra_data']['user']);
+		    assert.isString(body['extra_data']['user']['uuid']);
+		    return body;
+		})
 
-    .then(function(user) {
+		.then(function(body) {
+		    // use uuid to create uri
+		    // use accessToken as authentication (in Header)
+		    // get SMS conversations
 
-	assert.isString(user.uuid);
-	uuid = user.uuid;
+		    var uuid = body['extra_data']['user']['uuid'];
+		    var accessToken = body['access_token'];
+		    return rp.get(makeConversationOptions(uuid, accessToken))
+			.then(function(body) {
+			    debug(body);
+			    assert.equal(body.status, 'success');
+			    assert.isArray(body.data);
+			    assert.isObject(body.pagination);
+			    return body;
+			})
+		})
+	    
+	    
 
+	})
 
-	// make request to get OAuth bearer token
-	rp.get(makeOAuthOptions())
-	    .then(function(body) {
-		// get token from body
-		debug(body);
-		assert.equal(body['token_type'], 'bearer');
-		assert.isString(body['access_token']);
-		assert.isObject(body['extra_data']);
-		assert.isObject(body['extra_data']['user']);
-		assert.isString(body['extra_data']['user']['uuid']);
-		return body;
-	    })
-
-	    .then(function(body) {
-		// use uuid to create uri
-		// use accessToken as authentication (in Header)
-		// get SMS conversations
-
-		var uuid = body['extra_data']['user']['uuid'];
-		var accessToken = body['access_token'];
-		rp.get(makeConversationOptions(uuid, accessToken))
-		    .then(function(body) {
-			debug(body);
-			assert.equal(body.status, 'success');
-			assert.isArray(body.data);
-			assert.isObject(body.pagination);
-			return body;
-		    })
-	    })
-	
-	
-
-    })
-
+}
