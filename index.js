@@ -34,6 +34,15 @@ getCachedConversations()
     .then(function(convos) {
 	debug('got convos');
 	debug(convos);
+
+	// if cache is empty, fetch fresh data
+	if (typeof convos === 'undefined') {
+	    return getConversations()
+		.then(function(convos) {
+		    return extra.formatConvos(convos)
+		})
+	}
+
 	return extra.formatConvos(convos);
     })
     .then(function(convos) {

@@ -23,11 +23,11 @@ module.exports.formatConvos = function formatConvos(convos) {
 	var msg = d.messages[0];
 	             
 	fConvos.push([
-	    msg.message_id.toString(), // ID
-	    msg.read.toString(),       // Read?
-	    msg.from.toString(),       // Phone Number
-	    '@todo',                   // Contact
-	    msg.text.toString()        // Message Text
+	    msg.message_id.toString(),                         // ID
+	    (msg.read.toString() == 'true') ? 'T' : 'F',       // Read?
+	    msg.from.toString(),                               // Phone Number
+	    '@todo',                                           // Contact
+	    msg.text.toString()                                // Message Text
 	]);
     });
 
