@@ -9,10 +9,10 @@ var debug = require('debug')('bitlbee-ringto');
  * format the ring.to conversations object for displaying in the CLI
  */
 module.exports.formatConvos = function formatConvos(convos) {
-    assert.isObject(convos);
-    assert.isArray(convos.data);
-    assert.isString(convos.status);
-    assert.isObject(convos.pagination);
+    assert.isObject(convos, 'convos passed to formatConvos was not an object');
+    assert.isArray(convos.data, 'convos.data passed to formatConvos was not an Array');
+    assert.isString(convos.status, 'convos.status passed to formatConvos was not a string');
+    assert.isObject(convos.pagination, 'convos.pagination passed to formatConvos was not an object');
     assert.equal(convos.__type, 'conversation');
     assert.equal(convos.status, 'success');
 
@@ -43,6 +43,39 @@ module.exports.formatConvos = function formatConvos(convos) {
     //    ['509-...', 'chris', 'hello sir'],
     //    [...]
     //  ]
+}
+
+
+
+/**
+ * formatMessages
+ * format the ring.to messages object for displaying in the CLI
+ */
+module.exports.formatMessages = function formatMessages(messages) {
+    assert.isObject(messages, 'messages passed to formatMessages was not an object');
+    assert.isArray(messages.data, 'messages.data passed to formatMessages was not an array');
+    assert.isString(messages.status, 'messages.status passed to formatMessages was not a string');
+    assert.isObject(messages.pagination, 'messages.pagination passed to formatMessages was not an object');
+    assert.equal(messages.__type, 'messages');
+    assert.equal(messages.status, 'success');
+
+    var fMessages = [];
+    //debug(messages.data);
+
+    messages.data.forEach(function(d) {
+	var msg = d.messages[0];
+
+	fMessages.push([
+	    msg.message_id.toString(),                         // ID
+	    (msg.read.toString() == 'true') ? 'T' : 'F',       // Read?
+	    msg.from.toString(),                               // Phone Number
+	    '@todo',                                           // Contact
+	    msg.text.toString(),                               // Message Text
+	    msg.status.toString()                              // sent status
+	]);
+    });
+
+    return fMessages;
 }
 
 
