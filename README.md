@@ -1,5 +1,7 @@
 #bitlbee-ringto
 
+[![Greenkeeper badge](https://badges.greenkeeper.io/insanity54/bitlbee-ringto.svg)](https://greenkeeper.io/)
+
 access your Ring.to messages using the CLI
 
 Bitlbee support is on hold. currently runs standalone, only needing node.js + npm dependencies.
